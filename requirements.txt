@@ -1,4 +1,4 @@
 fastapi[standard]
 psycopg2-binary
 requests
-uvicorn
+pyngrok
