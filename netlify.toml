@@ -1,0 +1,8 @@
+[build]
+  command = "pip install -r requirements.txt"  # Build command
+  functions = "functions"  # Directory for serverless functions
+
+[functions]
+  directory = "functions"
+  external_node_modules = []
+  node_bundler = "esbuild"
