@@ -7,6 +7,7 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/strings", tags=["Strings"])
 
@@ -138,8 +139,12 @@ Now respond ONLY with a JSON object for this statement:
         return None
 
 
-@router.post("")
-def create_string(value: str):
+class StringRequest(BaseModel):
+    value: str
+
+@router.post("", status_code=201)
+def create_string(req: StringRequest):
+    value = req.value
     conn, cur = init_connection()
     cur.execute("SELECT * FROM stringproperties WHERE value = %s;", (value,))
     existing = cur.fetchone()
@@ -186,8 +191,8 @@ def create_string(value: str):
     return response
 
 @router.get("/filter-by-natural-language")
-def filter_with_nlp(statement: str):
-    filters = interpret_with_llm(statement)
+def filter_with_nlp(query: str):
+    filters = interpret_with_llm(query)
     if filters is None:
         raise HTTPException(500, "Error occurred when parsing the natural language query")
     
@@ -231,7 +236,7 @@ def get_specific_string(string_value: str):
     conn.close() 
     return response
 
-@router.get("/")
+@router.get("")
 def get_all_strings_with_filtering(is_palindrome: bool = None, min_length:int = None, max_length:int = None, word_count: int = None, contains_character: str = None):
     conn, cur = init_connection()
     data = []
